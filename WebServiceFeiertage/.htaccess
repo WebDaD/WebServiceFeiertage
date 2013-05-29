@@ -1,0 +1,2 @@
+RewriteEngine On
+RewriteRule ^([^/]*)/([^/]*)/([^/]*)$ /api.php?command=$1&parm=$2&out=$3 [L]

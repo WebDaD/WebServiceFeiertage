@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<rexpfd>
+    <destination path="SIW7DEV.fh-hfv-web02.hf.brnet.int:/var/www/wsf"/>
+    <options createDirectoryStructure="false" createSelectedOnly="true" descriptionFilePath="/WebServiceFeiertage/build_test.rexpfd" overWriteExistingFiles="true" reviewSynchronize="false" saveSettings="true"/>
+    <selectedElements>
+        <file path="/WebServiceFeiertage/api.php"/>
+        <file path="/WebServiceFeiertage/.htaccess"/>
+    </selectedElements>
+</rexpfd>
