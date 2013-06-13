@@ -17,28 +17,112 @@
  *
  */
 
-//TODO: Format CSS for HTML
+//TODO Fill in Values
+$TITLE = "";
+$VERSION = "0.5";
+$AUTHOR = "Dominik Sigmund";
+$CONTACT = "dominik.sigmund@webdad.eu";
+
 
 //TODO: Languages
 
 //Standarttext
-$html="<h1>WebService to get Feiertag</h1>";
+$html  = "<h1>WebService to get Feiertag</h1>";
+$html .= "<p></p>";
+
+$html .= "<h2> Example </h2>";
+$html .= "<p></p>";
+
+
+$html .= "<h2> Commands </h2>";
+$html .= "<p></p>";
+$html .= "<ul>";
+$html .= "	<li><a href=\"#cmd_check\">CHECK</a></li>";
+$html .= "	<li><a href=\"#cmd_list\">LIST</a></li>";
+$html .= "</ul>";
+$html .= "<h3 id=\"cmd_check\">CHECK</h3>";
+$html .= "<p></p>";
+$html .= "<h4> Parameters </h4>";
+$html .= "<table>";
+$html .= "<tr>";
+$html .= "	<th>Parameter</th>";
+$html .= "	<th>Description</th>";
+$html .= "</tr>";
+$html .= "<tr>";
+$html .= "	<td></td>";
+$html .= "	<td></td>";
+$html .= "</tr>";
+$html .= "</table>";
+
+$html .= "<h3 id=\"cmd_list\">LIST</h3>";
+$html .= "<p></p>";
+$html .= "<h4> Parameters </h4>";
+$html .= "<table>";
+$html .= "<tr>";
+$html .= "	<th>Parameter</th>";
+$html .= "	<th>Description</th>";
+$html .= "</tr>";
+$html .= "<tr>";
+$html .= "	<td></td>";
+$html .= "	<td></td>";
+$html .= "</tr>";
+$html .= "</table>";
+
+$html .= "<h2> Output </h2>";
+$html .= "<p></p>";
+$html .= "<table>";
+$html .= "<tr>";
+$html .= "	<th>Type</th>";
+$html .= "</tr>";
+$html .= "<tr>";
+$html .= "	<td>XML</td>";
+$html .= "</tr>";
+$html .= "<tr>";
+$html .= "	<td>HTML</td>";
+$html .= "</tr>";
+$html .= "<tr>";
+$html .= "	<td>JSON</td>";
+$html .= "</tr>";
+$html .= "</table>";
+
+$html .= "<h2> Regions </h2>";
+$html .= "<table>";
+$html .= "<tr>";
+$html .= "	<th>Region</th>";
+$html .= "	<th>Code</th>";
+$html .= "</tr>";
+$html .= "<tr>";
+$html .= "	<td>Germany - Bavaria</td>";
+$html .= "	<td>de-by</td>";
+$html .= "</tr>";
+$html .= "</table>";
+
+$html .= "<h2>Contact</h2>";
+$html .= "<p></p>";
+
 //TODO: Write Manual
+//Commands: GET|LIST
+//GET: get daystatus for DATE or NOW
+//LIST: get feiertage for YEAR or NOW
+
+//Parameter: DAY || YEAR || NOW
+
+//Output: XML|JSON|HTML
 
 if(count($_GET) == 0 && count($_POST) == 0){
 	die($html);	
 }
 
 //TODO: Remake htaccess
-//GEt Pars
+//Get Pars
 $command=getPar("command",true,"No Command given.");
 $parm =getPar("parm",true,"No Parameter given.");
 $output=getPar("out",true,"No Outputtype given.");
-$region=getPar("reg",true,"No Region given."); //TODO: Implement Region in getFeiertage
+$region=getPar("reg",true,"No Region given."); 
 
 //Matches:
-$match_year='((?:(?:[1]{1}\\d{1}\\d{1}\\d{1})|(?:[2]{1}\\d{3})))(?![\\d])';
-//TODO: match_date YYYY-MM-DD
+$match_year = '((?:(?:[1]{1}\\d{1}\\d{1}\\d{1})|(?:[2]{1}\\d{3})))(?![\\d])';
+$match_date = '((?:(?:[1]{1}\\d{1}\\d{1}\\d{1})|(?:[2]{1}\\d{3}))[-:\\/.](?:[0]?[1-9]|[1][012])[-:\\/.](?:(?:[0-2]?\\d{1})|(?:[3][01]{1})))(?![\\d])';
 
 //Main Switch on Command
 switch($command){
@@ -50,7 +134,7 @@ switch($command){
 			$html = checkFeiertag($parm);
 		}
 		else {
-			die(parm." is not a valid Parameter for Command CHECK.<br/>".$html); //TODO: error(msg) -> <span style="reddisch">msg</span>
+			die(error($parm." is not a valid Parameter for Command CHECK.<br/>").$html); 
 		}
 		break;
 	case "LIST":
@@ -61,11 +145,11 @@ switch($command){
 			$html = listFeiertage($parm);
 		}
 		else {
-			die(parm." is not a valid Parameter for Command LIST.<br/>".$html); //TODO: error(msg) -> <span style="reddisch">msg</span>
+			die(error($parm." is not a valid Parameter for Command LIST.<br/>").$html); 
 		}
 		break;
 	default:
-		die($command." is not a valid command.<br/>".$html);
+		die(error($command." is not a valid command.<br/>").$html);
 }
 
 switch($output){
@@ -84,33 +168,28 @@ switch($output){
 		break;
 	default:
 		echo htmlheader();
-		//TODO: Error
+		echo error($output." is not a valid output format.Please Check the Manual");
 		echo $html;
 		echo "</body></html>";
 		break;
 }
 
-//Commands: GET|LIST
-	//GET: get daystatus for DATE or NOW 
-	//LIST: get feiertage for YEAR or NOW
 
-//Parameter: DAY || YEAR || NOW
-
-//Output: XML|JSON|HTML
 
 
 function htmlheader(){
 	$h="<html>";
 	$h.="	<head>";
-	//TODO: INsert Head <title, metadata>
+	//TODO: INsert Head <title, metadata>, style (class.error)
 	$h.="	</head>";
 	$h.="	<body>";
 	return $h;
 }
 
 function checkFeiertag($day){
-	//TODO: check if year-month-day is a feiertag
-	
+	//TODO: check if year-month-day is a feiertag in $region
+	//global pars
+	global $html, $command, $parm, $output, $region;
 }
 
 /**
@@ -125,7 +204,7 @@ function checkFeiertag($day){
  */
 function listFeiertage($year){
 	//global pars
-	global $html, $command, $parm, $output, $region;
+	global $command, $parm, $output, $region;
 	
 	$dates = getFeiertage($year);
 	
@@ -180,23 +259,27 @@ function listFeiertage($year){
 function getFeiertage($year){
 	
 	//global pars
-	global $html, $command, $parm, $output, $region;
+	global $html,$command, $parm, $output, $region;
 	
 	$dates = array();
 	
-	//TODO: This function should use region !
-	//FixDates
-	$dates[0]=array( "day" => "01", "month"=> "01", "year" => $year, "name" => "Neujahr");
-	$dates[1]=array( "day" => "06", "month"=> "01", "year" => $year, "name" => "Heilige 3 Könige");
-	$dates[2]=array( "day" => "01", "month"=> "05", "year" => $year, "name" => "Tag der Arbeit");
-	$dates[3]=array( "day" => "15", "month"=> "08", "year" => $year, "name" => "Mariä Himmelfahrt");
-	$dates[4]=array( "day" => "03", "month"=> "10", "year" => $year, "name" => "Tag der Deutschen Einheit");
-	$dates[5]=array( "day" => "01", "month"=> "11", "year" => $year, "name" => "Allerheiligen");
-	$dates[6]=array( "day" => "25", "month"=> "12", "year" => $year, "name" => "1. Weihnachtsfeiertag");
-	$dates[7]=array( "day" => "26", "month"=> "12", "year" => $year, "name" => "2. Weihnachtsfeiertag");
-	
-	$dates = easterdates($year, $dates);
-	
+	switch($region){
+		case "de-by":
+			$dates[0]=array( "day" => "01", "month"=> "01", "year" => $year, "name" => "Neujahr");
+			$dates[1]=array( "day" => "06", "month"=> "01", "year" => $year, "name" => "Heilige 3 Könige");
+			$dates[2]=array( "day" => "01", "month"=> "05", "year" => $year, "name" => "Tag der Arbeit");
+			$dates[3]=array( "day" => "15", "month"=> "08", "year" => $year, "name" => "Mariä Himmelfahrt");
+			$dates[4]=array( "day" => "03", "month"=> "10", "year" => $year, "name" => "Tag der Deutschen Einheit");
+			$dates[5]=array( "day" => "01", "month"=> "11", "year" => $year, "name" => "Allerheiligen");
+			$dates[6]=array( "day" => "25", "month"=> "12", "year" => $year, "name" => "1. Weihnachtsfeiertag");
+			$dates[7]=array( "day" => "26", "month"=> "12", "year" => $year, "name" => "2. Weihnachtsfeiertag");
+			$dates = easterdates($year, $dates);
+			break;
+		//TODO: Add Regions
+		default:
+			die(error($region." is not yet implemented.").$html);
+			break;
+	}	
 	return $dates;
 }
 
@@ -262,5 +345,9 @@ function getPar($par, $mandatory=false, $message=""){
 		$r=$_GET[$par];
 	}
 	return $r;
+}
+
+function error($msg){
+	return "<span class=\"error\">".$msg."</span>";
 }
 ?>
