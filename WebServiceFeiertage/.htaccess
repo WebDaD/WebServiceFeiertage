@@ -1,2 +1,5 @@
 RewriteEngine On
-RewriteRule ^([^/]*)/([^/]*)/([^/]*)$ /api.php?command=$1&parm=$2&out=$3 [L]
+Options +FollowSymLinks
+RewriteRule ^api.php - [NC,L]
+RewriteRule ^LICENSE - [NC,L]
+RewriteRule ^([^/]*)/([^/]*)/([^/]*)/([^/]*)$ /api.php?command=$1&parm=$2&out=$3&reg=$4 [L]

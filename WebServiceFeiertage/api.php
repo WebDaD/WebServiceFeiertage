@@ -23,16 +23,19 @@ $VERSION = "0.5";
 $AUTHOR = "Dominik Sigmund";
 $CONTACT = "dominik.sigmund@webdad.eu";
 
+//TODO: save ip and URL and TELL PEOPLE!
 
+//TODO: Include Analytics somehow
 //TODO: Languages
 
 //Standarttext
 $html  = "<h1>WebService to get Feiertag</h1>";
+
 $html .= "<p></p>";
 
 $html .= "<h2> Example </h2>";
+$html .= "<p>http://wsf.webdad.eu/LIST/NOW/XML/de-by</p>";
 $html .= "<p></p>";
-
 
 $html .= "<h2> Commands </h2>";
 $html .= "<p></p>";
@@ -113,7 +116,6 @@ if(count($_GET) == 0 && count($_POST) == 0){
 	die($html);	
 }
 
-//TODO: Remake htaccess
 //Get Pars
 $command=getPar("command",true,"No Command given.");
 $parm =getPar("parm",true,"No Parameter given.");
