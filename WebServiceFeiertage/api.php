@@ -17,34 +17,43 @@
  *
  */
 
-//TODO Fill in Values
-$TITLE = "";
+$TITLE = "WebServiceFeiertage";
 $VERSION = "0.5";
 $AUTHOR = "Dominik Sigmund";
 $CONTACT = "dominik.sigmund@webdad.eu";
 
-//TODO: save ip and URL and TELL PEOPLE!
-
-//TODO: Include Analytics somehow
 //TODO: Languages
 
 //Standarttext
-$html  = "<h1>WebService to get Feiertag</h1>";
+$html  = "<h1>".$TITLE."</h1>";
 
-$html .= "<p></p>";
+$html .= "<p>Version: ".$VERSION." by ".$AUTHOR."</p>";
+$html .= "<p>Use this WebService to get Information of Holidays in a Year or Check if a Date is a Holiday.<br/>This Service and its Code is under <a href=\"http://wsf.webdad.eu/LICENSE\">GPLv3</a></p>";
+$html .= "<p style=\"color:darkred;\">".$TITLE." will save your IP and the URL you called to analyize the usage of this service.</p>";
 
-$html .= "<h2> Example </h2>";
-$html .= "<p>http://wsf.webdad.eu/LIST/NOW/XML/de-by</p>";
-$html .= "<p></p>";
+$html .= "<h2>How to</h2>";
+$html .= "<p>Just Call the Following URL:</p>";
+$html .= "<p>http://wsf.webdad.eu/<a href=\"#commands\">COMMAND</a>/PARAMETER/<a href=\"#out\">OUTPUT</a>/<a href=\"#reg\">REGION</a></p>";
+$html .= "<p>Or POST the following Parameters to http://wsf.webdad.eu/api.php</p>";
+$html .= "<p><a href=\"#commands\">command</a>, parm, <a href=\"#out\">out</a>, <a href=\"#reg\">reg</a></p>";
 
-$html .= "<h2> Commands </h2>";
-$html .= "<p></p>";
+$html .= "<h2> Examples </h2>";
+$html .= "<dl>";
+$html .= "	<dt><a href=\"http://wsf.webdad.eu/LIST/NOW/XML/de-by\" target=\"_blank\">http://wsf.webdad.eu/LIST/NOW/XML/de-by</a></dt>";
+$html .= "		<dd>Get a XML-List of all Holidays in this year in Bavaria / Germany</dd>";
+$html .= "	<dt><a href=\"http://wsf.webdad.eu/CHECK/NOW/JSON/de-by\" target=\"_blank\">http://wsf.webdad.eu/CHECK/NOW/JSON/de-by</a></dt>";
+$html .= "		<dd>Get a JSON-Element containing ob today is a holiday in Bavaria / Germany</dd>";
+$html .= "</dl>";
+
+$html .= "<h2 id=\"commands\"> Commands </h2>";
+$html .= "<p>This is a list of all possible Commands</p>";
 $html .= "<ul>";
 $html .= "	<li><a href=\"#cmd_check\">CHECK</a></li>";
 $html .= "	<li><a href=\"#cmd_list\">LIST</a></li>";
 $html .= "</ul>";
+
 $html .= "<h3 id=\"cmd_check\">CHECK</h3>";
-$html .= "<p></p>";
+$html .= "<p>This Command Checks a specific date to be a holiday.</p>";
 $html .= "<h4> Parameters </h4>";
 $html .= "<table>";
 $html .= "<tr>";
@@ -52,13 +61,17 @@ $html .= "	<th>Parameter</th>";
 $html .= "	<th>Description</th>";
 $html .= "</tr>";
 $html .= "<tr>";
-$html .= "	<td></td>";
-$html .= "	<td></td>";
+$html .= "	<td>NOW</td>";
+$html .= "	<td>Checks Today</td>";
+$html .= "</tr>";
+$html .= "<tr>";
+$html .= "	<td>YYYY-MM-DD</td>";
+$html .= "	<td>CHecks this Date to be a holiday</td>";
 $html .= "</tr>";
 $html .= "</table>";
 
 $html .= "<h3 id=\"cmd_list\">LIST</h3>";
-$html .= "<p></p>";
+$html .= "<p>This Command lists all Holidays for its Parameter</p>";
 $html .= "<h4> Parameters </h4>";
 $html .= "<table>";
 $html .= "<tr>";
@@ -66,13 +79,17 @@ $html .= "	<th>Parameter</th>";
 $html .= "	<th>Description</th>";
 $html .= "</tr>";
 $html .= "<tr>";
-$html .= "	<td></td>";
-$html .= "	<td></td>";
+$html .= "	<td>NOW</td>";
+$html .= "	<td>The Year we are in right now</td>";
+$html .= "</tr>";
+$html .= "<tr>";
+$html .= "	<td>YYYY</td>";
+$html .= "	<td>Enter a 4-digit-year to get the holidays for this year</td>";
 $html .= "</tr>";
 $html .= "</table>";
 
-$html .= "<h2> Output </h2>";
-$html .= "<p></p>";
+$html .= "<h2 id=\"out\"> Output </h2>";
+$html .= "<p>Here is a List of implemented Output Options.</p>";
 $html .= "<table>";
 $html .= "<tr>";
 $html .= "	<th>Type</th>";
@@ -88,7 +105,8 @@ $html .= "	<td>JSON</td>";
 $html .= "</tr>";
 $html .= "</table>";
 
-$html .= "<h2> Regions </h2>";
+$html .= "<h2 id=\"reg\"> Regions </h2>";
+$html .= "<p>Here is a List of implemented Regions and their correspoding code.</p>";
 $html .= "<table>";
 $html .= "<tr>";
 $html .= "	<th>Region</th>";
@@ -101,16 +119,7 @@ $html .= "</tr>";
 $html .= "</table>";
 
 $html .= "<h2>Contact</h2>";
-$html .= "<p></p>";
-
-//TODO: Write Manual
-//Commands: GET|LIST
-//GET: get daystatus for DATE or NOW
-//LIST: get feiertage for YEAR or NOW
-
-//Parameter: DAY || YEAR || NOW
-
-//Output: XML|JSON|HTML
+$html .= "<p>You have problems using wsf? <br/>You found a bug?<br/> Your Region is not implemented?<br/>Just write to:<br/><b><a href=\"mailto:dominik.sigmund@webdad.eu\">dominik(dot)sigmund(st)webdad(dot)eu</a></b></p>";
 
 if(count($_GET) == 0 && count($_POST) == 0){
 	die($html);	
@@ -121,6 +130,12 @@ $command=getPar("command",true,"No Command given.");
 $parm =getPar("parm",true,"No Parameter given.");
 $output=getPar("out",true,"No Outputtype given.");
 $region=getPar("reg",true,"No Region given."); 
+
+//SAVE IP-Adress and some Data
+mysql_connect("localhost","d0177257","QcrwfG4hd55tFrqT");
+mysql_select_db("d0177257");
+mysql_query("INSERT INTO holidays (ipaddr, method, querystring) VALUES ('".$_SERVER['REMOTE_ADDR']."', '".$_SERVER['REQUEST_METHOD']."', '".$_SERVER['QUERY_STRING']."')");
+mysql_close();
 
 //Matches:
 $match_year = '((?:(?:[1]{1}\\d{1}\\d{1}\\d{1})|(?:[2]{1}\\d{3})))(?![\\d])';
@@ -170,7 +185,7 @@ switch($output){
 		break;
 	default:
 		echo htmlheader();
-		echo error($output." is not a valid output format.Please Check the Manual");
+		echo error($output." is not a valid output format.");
 		echo $html;
 		echo "</body></html>";
 		break;
@@ -180,9 +195,17 @@ switch($output){
 
 
 function htmlheader(){
+	global $TITLE, $AUTHOR;
 	$h="<html>";
 	$h.="	<head>";
-	//TODO: INsert Head <title, metadata>, style (class.error)
+	$h.= "		<title>".$TITLE."</title>";
+	$h.= "		<meta name=\"description\" content=\"A Webservice to Check or List Holidays for specific dates or now\" />";
+	$h.= "		<meta name=\"keywords\" content=\"webservice, service, rest, restful, holidays\" />";
+	$h.= "		<meta name=\"author\" content=\"".$AUTHOR."\">";
+	$h.= "		<meta name=\"robots\" content=\"index, follow\">";
+	$h.= "		<meta name=\"revisit-after\" content=\"3 month\">";
+	$h.= "		<style>.errorhead{border:2px solid red;background-color:red;color:white;padding:4px 4px 4px 4px;}</style>";
+	$h.= "		<style>.error{border:2px solid red;background-color:white;color:red;padding:4px 4px 4px 4px;}</style>";
 	$h.="	</head>";
 	$h.="	<body>";
 	return $h;
@@ -206,7 +229,7 @@ function checkFeiertag($day){
  */
 function listFeiertage($year){
 	//global pars
-	global $command, $parm, $output, $region;
+	global $command, $parm, $output, $region, $html;
 	
 	$dates = getFeiertage($year);
 	
@@ -242,7 +265,7 @@ function listFeiertage($year){
 		}
 		$h .= "</table>";
 	}
-	else { //JSON
+	else if($output=="JSON"){
 		$h = "{\"Service\": \"WSF\", \"Command\": \"".$command."\", \"Parameter\": \"".$parm."\", \"Region\": \"".$region."\", \"Feiertage\": {[";
 		foreach ($dates as $val){
 			$h .="	[";
@@ -254,6 +277,9 @@ function listFeiertage($year){
 		}
 		$h = rtrim($h,",");
 		$h .="]} }";
+	}
+	else{
+		$h=$html;
 	}
 	return $h;
 }
@@ -350,6 +376,6 @@ function getPar($par, $mandatory=false, $message=""){
 }
 
 function error($msg){
-	return "<span class=\"error\">".$msg."</span>";
+	return "<table><tr><td class=\"errorhead\">ERROR</td></tr><tr><td class=\"error\"><b>".$msg."</b><br/>Please Check the Manual below.</td></tr></table>";
 }
 ?>
