@@ -4,10 +4,10 @@
  *
  *
  * @version 0.1
- * @param $_GET["command"] A GET Command: CHECK or LIST
- * @param $_POST["command"] A POST Command: CHECK or LIST
- * @param $_GET["parm"] A GET Parameter: DATE or YEAR or NOW 
- * @param $_POST["parm"]A POST Parameter: DATE or YEAR or NOW
+ * @param $_GET["command"] A GET Command: CHECK or LIST or GET
+ * @param $_POST["command"] A POST Command: CHECK or LIST or GET
+ * @param $_GET["parm"] A GET Parameter: DATE or YEAR or NOW or getParm
+ * @param $_POST["parm"]A POST Parameter: DATE or YEAR or NOW or getParm
  * @param $_GET["out"] A GET Output: XML or JSON or HTML
  * @param $_POST["out"] A POST Output: XML or JSON or HTML
  * @param $_GET["reg"] A GET Region: eg DE-BY, US, ...
@@ -22,7 +22,7 @@ $VERSION = "0.5";
 $AUTHOR = "Dominik Sigmund";
 $CONTACT = "dominik.sigmund@webdad.eu";
 
-//TODO: Languages
+//TODO: Add Languages
 
 //Standarttext
 $html  = "<h1>".$TITLE."</h1>";
@@ -50,6 +50,7 @@ $html .= "<p>This is a list of all possible Commands</p>";
 $html .= "<ul>";
 $html .= "	<li><a href=\"#cmd_check\">CHECK</a></li>";
 $html .= "	<li><a href=\"#cmd_list\">LIST</a></li>";
+$html .= "	<li><a href=\"#cmd_get\">GET</a></li>";
 $html .= "</ul>";
 
 $html .= "<h3 id=\"cmd_check\">CHECK</h3>";
@@ -85,6 +86,28 @@ $html .= "</tr>";
 $html .= "<tr>";
 $html .= "	<td>YYYY</td>";
 $html .= "	<td>Enter a 4-digit-year to get the holidays for this year</td>";
+$html .= "</tr>";
+$html .= "</table>";
+
+$html .= "<h3 id=\"cmd_get\">GET</h3>";
+$html .= "<p>This Command allows you to get values for paramters</p>";
+$html .= "<h4> Parameters </h4>";
+$html .= "<table>";
+$html .= "<tr>";
+$html .= "	<th>Parameter</th>";
+$html .= "	<th>Description</th>";
+$html .= "</tr>";
+$html .= "<tr>";
+$html .= "	<td>REGIONS</td>";
+$html .= "	<td>Gets all possible Regions</td>";
+$html .= "</tr>";
+$html .= "<tr>";
+$html .= "	<td>COMMANDS</td>";
+$html .= "	<td>Gets all possible Commands</td>";
+$html .= "</tr>";
+$html .= "<tr>";
+$html .= "	<td>OUTPUTS</td>";
+$html .= "	<td>Gets all possible Outputs</td>";
 $html .= "</tr>";
 $html .= "</table>";
 
@@ -139,13 +162,13 @@ mysql_close();
 
 //Matches:
 $match_year = '((?:(?:[1]{1}\\d{1}\\d{1}\\d{1})|(?:[2]{1}\\d{3})))(?![\\d])';
-$match_date = '((?:(?:[1]{1}\\d{1}\\d{1}\\d{1})|(?:[2]{1}\\d{3}))[-:\\/.](?:[0]?[1-9]|[1][012])[-:\\/.](?:(?:[0-2]?\\d{1})|(?:[3][01]{1})))(?![\\d])';
+$match_date = '/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/';
 
 //Main Switch on Command
 switch($command){
 	case "CHECK":
 		if($parm=="NOW"){
-			$html = checkFeiertag(date('d'));
+			$html = checkFeiertag(date('Y-m-d'));
 		}
 		else if(preg_match($match_date, $parm)){
 			$html = checkFeiertag($parm);
@@ -163,6 +186,22 @@ switch($command){
 		}
 		else {
 			die(error($parm." is not a valid Parameter for Command LIST.<br/>").$html); 
+		}
+		break;
+	case "GET":
+		switch($parm){
+			case "COMMANDS":
+				$html = getCommands();
+				break;
+			case "REGIONS":
+				$html = getRegions();
+				break;
+			case "OUTPUTS":
+				$html = getOutputs();
+				break;
+			default:
+				die(error($parm." is not a valid Parameter for Command GET.<br/>").$html);
+				break;
 		}
 		break;
 	default:
@@ -212,9 +251,168 @@ function htmlheader(){
 }
 
 function checkFeiertag($day){
-	//TODO: check if year-month-day is a feiertag in $region
 	//global pars
 	global $html, $command, $parm, $output, $region;
+	
+	$check = "false";
+	$name = "";
+	//split day into three vars
+	$t = explode("-", $day);
+	$y = $t[0];
+	$m = $t[1];
+	$d = $t[2];
+	
+	//get feiertage for region
+	$dates = getFeiertage($y);
+	
+	//check if array contains day
+	foreach($dates AS $date){
+		if($date["day"] == $d && $date["month"] == $m && $date["year"] == $y){
+			$check ="true";
+			$name = $date["name"];
+			break;
+		}
+	}
+	//return formated output (true, false AND name if true)
+	if($output=="XML"){
+		$h = "<wsf command=\"".$command."\" parm=\"".$parm."\" region=\"".$region."\">";
+		$h .="	<check>".$day."</check>";
+		$h .="	<result>".$check."</result>";
+		$h .="	<details>".$name."</details>";
+		$h .="</wsf>";
+	}
+	else if($output=="HTML"){
+		$h = "<h1>Commands</h1>";
+		$h .= "<h2>".$command." ".$parm." in ".$region."</h2>";
+		$h .= "<table>";
+		$h .="	<tr>";
+		$h .="		<th>Check</th>";
+		$h .="		<td>".$day."</td>";
+		$h .="	</tr>";
+		$h .="	<tr>";
+		$h .="		<th>Result</th>";
+		$h .="		<td>".$check."</td>";
+		$h .="	</tr>";
+		$h .="	<tr>";
+		$h .="		<th>Details</th>";
+		$h .="		<td>".$name."</td>";
+		$h .="	</tr>";
+		$h .= "</table>";
+	}
+	else if($output=="JSON"){
+		$h = "{\"Service\": \"WSF\", \"Command\": \"".$command."\", \"Parameter\": \"".$parm."\", \"Region\": \"".$region."\", \"Results\": {[";
+		$h .="	\"".$day."\",";
+		$h .="	\"".$check."\",";
+		$h .="	\"".$name."\",";
+		$h = rtrim($h,",");
+		$h .="]} }";
+	}
+	else{
+		$h=$html;
+	}
+	return $h;
+}
+
+function getCommands(){
+	global $command, $parm, $output, $region, $html;
+	if($output=="XML"){
+		$h = "<wsf command=\"".$command."\" parm=\"".$parm."\" region=\"".$region."\">";
+		$h .="	<command>LIST</command>";
+		$h .="	<command>CHECK</command>";
+		$h .="	<command>GET</command>";
+		$h .="</wsf>";
+	}
+	else if($output=="HTML"){
+		$h = "<h1>Commands</h1>";
+		$h .= "<h2>".$command." ".$parm." in ".$region."</h2>";
+		$h .= "<table>";
+		$h .="	<tr>";
+		$h .="		<td>LIST</td>";
+		$h .="	</tr>";
+		$h .="	<tr>";
+		$h .="		<td>CHECK</td>";
+		$h .="	</tr>";
+		$h .="	<tr>";
+		$h .="		<td>GET</td>";
+		$h .="	</tr>";
+		$h .= "</table>";
+	}
+	else if($output=="JSON"){
+		$h = "{\"Service\": \"WSF\", \"Command\": \"".$command."\", \"Parameter\": \"".$parm."\", \"Region\": \"".$region."\", \"Commands\": {[";
+		$h .="	\"LIST\",";
+		$h .="	\"CHECK\",";
+		$h .="	\"GET\",";
+		$h = rtrim($h,",");
+		$h .="]} }";
+	}
+	else{
+		$h=$html;
+	}
+	return $h;
+}
+function getRegions(){
+	global $command, $parm, $output, $region, $html;
+	if($output=="XML"){
+		$h = "<wsf command=\"".$command."\" parm=\"".$parm."\" region=\"".$region."\">";
+		$h .="	<region>de-by</region>";
+		$h .="</wsf>";
+	}
+	else if($output=="HTML"){
+		$h = "<h1>Regions</h1>";
+		$h .= "<h2>".$command." ".$parm." in ".$region."</h2>";
+		$h .= "<table>";
+		$h .="	<tr>";
+		$h .="		<td>de-by</td>";
+		$h .="	</tr>";
+		$h .= "</table>";
+	}
+	else if($output=="JSON"){
+		$h = "{\"Service\": \"WSF\", \"Command\": \"".$command."\", \"Parameter\": \"".$parm."\", \"Region\": \"".$region."\", \"Regions\": {[";
+		$h .="	\"de-by\",";
+		$h = rtrim($h,",");
+		$h .="]} }";
+	}
+	else{
+		$h=$html;
+	}
+	return $h;
+}
+function getOutputs(){
+	global $command, $parm, $output, $region, $html;
+	if($output=="XML"){
+		$h = "<wsf command=\"".$command."\" parm=\"".$parm."\" region=\"".$region."\">";
+		$h .="	<output>XML</output>";
+		$h .="	<output>HTML</output>";
+		$h .="	<output>JSON</output>";
+		$h .="</wsf>";
+	}
+	else if($output=="HTML"){
+		$h = "<h1>Outputs</h1>";
+		$h .= "<h2>".$command." ".$parm." in ".$region."</h2>";
+		$h .= "<table>";
+		$h .="	<tr>";
+		$h .="		<td>XML</td>";
+		$h .="	</tr>";
+		$h .="	<tr>";
+		$h .="		<td>HTML</td>";
+		$h .="	</tr>";
+		$h .="	<tr>";
+		$h .="		<td>JSON</td>";
+		$h .="	</tr>";
+		$h .= "</table>";
+	}
+	else if($output=="JSON"){
+		$h = "{\"Service\": \"WSF\", \"Command\": \"".$command."\", \"Parameter\": \"".$parm."\", \"Region\": \"".$region."\", \"Outputs\": {[";
+		$h .="	\"XML\",";
+		$h .="	\"HTML\",";
+		$h .="	\"JSON\",";
+		$h = rtrim($h,",");
+		$h .="]} }";
+	}
+	else{
+		$h=$html;
+	}
+	return $h;
 }
 
 /**
@@ -303,7 +501,7 @@ function getFeiertage($year){
 			$dates[7]=array( "day" => "26", "month"=> "12", "year" => $year, "name" => "2. Weihnachtsfeiertag");
 			$dates = easterdates($year, $dates);
 			break;
-		//TODO: Add Regions
+		//TODO: Add Regions (at least US and all other de's)
 		default:
 			die(error($region." is not yet implemented.").$html);
 			break;
