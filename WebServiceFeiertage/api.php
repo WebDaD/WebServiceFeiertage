@@ -139,6 +139,10 @@ $html .= "<tr>";
 $html .= "	<td>Germany - Bavaria</td>";
 $html .= "	<td>de-by</td>";
 $html .= "</tr>";
+$html .= "<tr>";
+$html .= "	<td>United States of America</td>";
+$html .= "	<td>us</td>";
+$html .= "</tr>";
 $html .= "</table>";
 
 $html .= "<h2>Contact</h2>";
@@ -161,7 +165,7 @@ mysql_query("INSERT INTO holidays (ipaddr, method, querystring) VALUES ('".$_SER
 mysql_close();
 
 //Matches:
-$match_year = '((?:(?:[1]{1}\\d{1}\\d{1}\\d{1})|(?:[2]{1}\\d{3})))(?![\\d])';
+$match_year = '/^[0-9]{4}$/';
 $match_date = '/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/';
 
 //Main Switch on Command
@@ -355,6 +359,7 @@ function getRegions(){
 	if($output=="XML"){
 		$h = "<wsf command=\"".$command."\" parm=\"".$parm."\" region=\"".$region."\">";
 		$h .="	<region>de-by</region>";
+		$h .="	<region>us</region>";
 		$h .="</wsf>";
 	}
 	else if($output=="HTML"){
@@ -364,11 +369,15 @@ function getRegions(){
 		$h .="	<tr>";
 		$h .="		<td>de-by</td>";
 		$h .="	</tr>";
+		$h .="	<tr>";
+		$h .="		<td>us</td>";
+		$h .="	</tr>";
 		$h .= "</table>";
 	}
 	else if($output=="JSON"){
 		$h = "{\"Service\": \"WSF\", \"Command\": \"".$command."\", \"Parameter\": \"".$parm."\", \"Region\": \"".$region."\", \"Regions\": {[";
 		$h .="	\"de-by\",";
+		$h .="	\"us\",";
 		$h = rtrim($h,",");
 		$h .="]} }";
 	}
@@ -501,12 +510,44 @@ function getFeiertage($year){
 			$dates[7]=array( "day" => "26", "month"=> "12", "year" => $year, "name" => "2. Weihnachtsfeiertag");
 			$dates = easterdates($year, $dates);
 			break;
-		//TODO: Add Regions (at least US and all other de's)
+		case "us": 
+			$dates[0]=array( "day" => "01", "month"=> "01", "year" => $year, "name" => "New Year's Day");
+			$dates[1] = getDayInMonth("3", "monday", "01",$year, "Martin Luther King Day");
+			$dates[2] = getDayInMonth("3", "monday", "02",$year, "Washington's Birthday");
+			$dates[3] = getDayInMonth("last", "monday", "05",$year, "Memorial Day");
+			$dates[4]=array( "day" => "04", "month"=> "07", "year" => $year, "name" => "Independence Day");
+			$dates[5] = getDayInMonth("1", "monday", "09",$year, "Labor Day");
+			$dates[6] = getDayInMonth("2", "monday", "10",$year, "Columbus Day");
+			$dates[7]=array( "day" => "11", "month"=> "11", "year" => $year, "name" => "Veterans Day");
+			$dates[8] = getDayInMonth("4", "thursday", "11",$year, "Thanksgiving Day");
+			$dates[7]=array( "day" => "25", "month"=> "12", "year" => $year, "name" => "Christmas Day");
+			break;
+		//TODO: Add Regions (at all other de's)
 		default:
 			die(error($region." is not yet implemented.").$html);
 			break;
 	}	
 	return $dates;
+}
+
+function getDayInMonth($number, $day, $month,$year, $name){
+	$date = array();
+	$date["name"] = $name;
+	$month = intval($month);
+	$monthName = date("F", mktime(0, 0, 0, $month, 10));
+	switch($number){
+		case "1":$number="first";break;
+		case "2":$number="second";break;
+		case "3":$number="third";break;
+		case "4":$number="fourth";break;
+		default:break;
+	}
+	$tc = strtotime($number.' '.$day.' of '.$monthName.' '.$year);
+	$date["day"] = date('d',$tc);
+	$date["month"] = date('m',$tc);
+	$date["year"] = date('Y',$tc);
+	
+	return $date;
 }
 
 function easterdates($year, $dates){
