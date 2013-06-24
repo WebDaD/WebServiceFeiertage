@@ -148,6 +148,15 @@ $html .= "</table>";
 $html .= "<h2>Contact</h2>";
 $html .= "<p>You have problems using wsf? <br/>You found a bug?<br/> Your Region is not implemented?<br/>Just write to:<br/><b><a href=\"mailto:dominik.sigmund@webdad.eu\">dominik(dot)sigmund(st)webdad(dot)eu</a></b></p>";
 
+$html .= "<h2>Donate</h2>";
+$html .= "<p>You want to help keep the good service up?<br/><form action=\"https://www.paypal.com/cgi-bin/webscr\" method=\"post\" target=\"_top\">
+<input type=\"hidden\" name=\"cmd\" value=\"_s-xclick\">
+<input type=\"hidden\" name=\"hosted_button_id\" value=\"EHTE336AJLJEQ\">
+<input type=\"image\" src=\"https://www.paypalobjects.com/de_DE/DE/i/btn/btn_donateCC_LG.gif\" border=\"0\" name=\"submit\" alt=\"Jetzt einfach, schnell und sicher online bezahlen – mit PayPal.\">
+<img alt=\"\" border=\"0\" src=\"https://www.paypalobjects.com/de_DE/i/scr/pixel.gif\" width=\"1\" height=\"1\">
+</form>
+</p>";
+
 if(count($_GET) == 0 && count($_POST) == 0){
 	die($html);	
 }
